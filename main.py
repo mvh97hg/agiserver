@@ -12,6 +12,12 @@ from panoramisk.fast_agi import Application, Request
 import signal
 import sys
 from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException
+import threading
+import uvicorn
+
+# from flask import Flask, jsonify
+
 
 def initlogger(log_file, log_level):
     log_dir = os.path.dirname(log_file)
@@ -546,6 +552,33 @@ class FastAGIApp:
 # Global app instance
 app = FastAGIApp()
 logger = None
+fastapi = FastAPI()
+
+
+@fastapi.get("/health", status_code=200)
+async def health_check():
+    """Health check endpoint"""
+
+    status = {"redis": "ok", "rabbitmq": "ok"}
+
+    try:
+        redis_client = await app.redis_manager.get_redis()
+        await redis_client.ping()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Redis error: {e}")
+    try:
+        if (
+            not app.rabbitmq_manager._connection
+            or app.rabbitmq_manager._connection.is_closed
+        ):
+            await app.rabbitmq_manager.connect()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"RabbitMQ error: {e}")
+    return status
+
+
+def run_fastapi():
+    uvicorn.run(fastapi, host="0.0.0.0", port=8080)
 
 
 async def main():
@@ -574,4 +607,5 @@ async def main():
 
 
 if __name__ == "__main__":
+    threading.Thread(target=run_fastapi, daemon=True).start()
     asyncio.run(main())

@@ -12,13 +12,19 @@ services:
       - RABBITMQ_PORT=${RABBITMQ_PORT:-5672}
       - RABBITMQ_USER=${RABBITMQ_USER:-guest}
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
+      - FASTAGI_HOST=${FASTAGI_HOST:-0.0.0.0}
+      - FASTAGI_PORT=${FASTAGI_PORT:-4753}
       - LOG_FILE=${LOG_FILE:-/var/log/fastagi/fastagi.log}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
     volumes:
       - ./logs:/var/log/fastagi
     ports:
       - "4753:4753"
-
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 20s
+      timeout: 10s
+      retries: 3
   rabbitmq:
     image: mvhung/rabbitmq:management-alpine-mqtt
     container_name: rabbitmq
