@@ -18,10 +18,41 @@ services:
       - ./logs:/var/log/fastagi
     ports:
       - "4753:4753"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 5s
-      start_period: 10s
-      retries: 3
+
+  rabbitmq:
+    image: mvhung/rabbitmq:management-alpine-mqtt
+    container_name: rabbitmq
+    environment: 
+      - RABBITMQ_CONFIG_FILE=${RABBITMQ_CONFIG_FILE}
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER:-guest}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD:-guest}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - /etc/localtime:/etc/localtime:ro
+
+
+  redis:
+    image: docker.io/bitnami/redis:7.4
+    container_name: redis
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/bitnami/redis
+      - /etc/localtime:/etc/localtime:ro
+
+volumes:
+  rabbitmq_data:  
+    driver: local
+  redis_data:
+    driver: local
+networks:
+  default: 
+    driver: bridge
+    name: agiserver_network
+
 
