@@ -65,7 +65,7 @@ exten => _X.,n,Hangup()
 ### Redis
 #### Blacklist
 ```
-Key: phone:blacklist:{PhoneNumber}
+Key: phone:blacklist:{phone_number}
 Value: "1"
 TTL: 86400 seconds (24 hours)
 ```
@@ -74,11 +74,11 @@ TTL: 86400 seconds (24 hours)
 ```
 Key: phone:vip
 Type: Set
-Members: PhoneNumber
+Members: phone_number
 ```
 #### Trạng thái cuộc gọi
 ```
-Key stats:calls:{CustomerId}:{CallStatus}
+Key stats:calls:{customer_id}:{call_status}
 Type: Set
 Members: CallId
 ```
@@ -87,8 +87,8 @@ Members: CallId
 
 ```
 Exchange: call.events
-Queue: call.events.{CustomerId}
-Routing key: call.events.{CustomerId}
+Queue: call.events.{customer_id}
+Routing key: call.events.{customer_id}
 ```
 #### Event JSON Model
 
@@ -102,7 +102,7 @@ Routing key: call.events.{CustomerId}
   "unique_id": "1752899481.313",
   "phone_number": "84912406496",
   "linked_id": "1752899481.313",
-  "call_status": "RINGING",
+  "call_status": "ringing",
   "queue_name": "ky_thuat",
   "bill_sec": "0",
   "duration": "0",

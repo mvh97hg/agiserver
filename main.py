@@ -258,7 +258,7 @@ class CallEvent:
             "unique_id": self.unique_id,
             "phone_number": self.phone_number,
             "linked_id": self.linked_id,
-            "call_status": self.call_status,
+            "call_status": self.call_status.lower(),
             "queue_name": self.queue_name,
             "bill_sec": self.bill_sec,
             "duration": self.duration,
