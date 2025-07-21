@@ -16,8 +16,6 @@ from fastapi import FastAPI, HTTPException
 import threading
 import uvicorn
 
-# from flask import Flask, jsonify
-
 
 def initlogger(log_file, log_level):
     log_dir = os.path.dirname(log_file)
@@ -383,9 +381,9 @@ class AGIHandler:
 
         try:
 
-            await agi.send_command(f"VERBOSE ======Start-check-phone-number=== 1")
+            await agi.send_command("VERBOSE ======Start-check-phone-number=== 1")
             phone_number = agi.headers.get("agi_callerid", "").strip()
-            caller_number = result = await agi.send_command(f"GET VARIABLE PHONE_DIAL")
+            caller_number = result = await agi.send_command("GET VARIABLE PHONE_DIAL")
 
             if not phone_number and not caller_number:
                 logger.warning("No phone number found in AGI variables")
@@ -404,7 +402,7 @@ class AGIHandler:
             if is_blacklisted:
                 logger.info(f"Phone {check_phone} is blacklisted, hangup")
 
-                await agi.send_command(f"VERBOSE ======Phone-blacklisted=Hangup 1")
+                await agi.send_command("VERBOSE ======Phone-blacklisted=Hangup 1")
                 await agi.send_command("HANGUP")
                 return
 
@@ -429,7 +427,7 @@ class AGIHandler:
 
         try:
             # logger.info(f"Received event request: {agi.headers}")
-            await agi.send_command(f"VERBOSE ======Send-Call-Event=== 1")
+            await agi.send_command("VERBOSE ======Send-Call-Event=== 1")
 
             agi_vars = [
                 "START_TIME",
@@ -482,7 +480,7 @@ class AGIHandler:
             # Gửi event lên RabbitMQ
             await self.rabbitmq_manager.publish_event(event_data)
             logger.info(f"Event handler completed.")
-            await agi.send_command(f"VERBOSE ======Event-handler-completed=== 1")
+            await agi.send_command("VERBOSE ======Event-handler-completed=== 1")
 
         except Exception as e:
             logger.error(f"Error in event handler: {e}")
